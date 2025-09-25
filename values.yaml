@@ -1,0 +1,29 @@
+serverFiles:
+  alerts:
+    groups:
+    - name: disk-alerts
+      rules:
+      - alert: DiskUsageHigh
+        expr: (node_filesystem_size_bytes{mountpoint="/"} - node_filesystem_free_bytes{mountpoint="/"}) 
+              / node_filesystem_size_bytes{mountpoint="/"} * 100 > 20.55
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Disco alto en {{ $labels.instance }}"
+          description: "El nodo {{ $labels.instance }} superó 20.55% de uso de disco en / durante 1m."
+
+alertmanager:
+  config:
+    global:
+      smtp_smarthost: 'smtp.gmail.com:587'
+      smtp_from: 'hansleolml@gmail.com'
+      smtp_auth_username: 'hansleolml@gmail.com'
+      smtp_auth_password: ''   # no es tu clave normal, es un App Password
+      smtp_require_tls: true
+    route:
+      receiver: 'correo'
+    receivers:
+    - name: 'correo'
+      email_configs:
+      - to: 'hansleolml@gmail.com'
